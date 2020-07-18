@@ -1,7 +1,5 @@
-cdef extern from "colorchord/colorchord2/notefinder.h":
-	ctypedef struct NoteFinder:
-		pass
-	ctypedef struct NoteDists:
+cdef extern from "notefinder.h":
+	struct NoteFinder:
 		pass
 
 	NoteFinder*CreateNoteFinder(int spsRec);

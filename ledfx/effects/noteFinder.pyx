@@ -1,4 +1,6 @@
+cimport cython
 from ledfx.effects cimport cnoteFinder
+from libc.stdlib cimport malloc, free
 
 cdef class NoteFinder:
 	cdef cnoteFinder.NoteFinder* _c_note_finder
@@ -17,4 +19,20 @@ cdef class NoteFinder:
 		cnoteFinder.ChangeNFParameters(self._c_note_finder)
 
 	def samples_updated(self, samples):
-		cnoteFinder.RunNoteFinder(self._c_note_finder, samples, 0, len(samples))
+		cdef:
+			float * cfloats
+			int i
+		cfloats = <float *> malloc(len(samples)*cython.sizeof(float))
+		if cfloats is NULL:
+			raise MemoryError()
+		for i in range(len(samples)):
+			cfloats[i] = samples[i]
+		cnoteFinder.RunNoteFinder(self._c_note_finder, cfloats, 0, len(samples))
+		free(cfloats)
+
+
+
+
+
+
+
