@@ -26,7 +26,7 @@ cdef class NoteFinder:
 		if cfloats is NULL:
 			raise MemoryError()
 		for i in range(len(samples)):
-			cfloats[i] = samples[i]
+			cfloats[i] = samples[i]/float(255)
 		cnoteFinder.RunNoteFinder(self._c_note_finder, cfloats, 0, len(samples))
 		free(cfloats)
 
