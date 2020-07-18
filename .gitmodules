@@ -1,0 +1,3 @@
+[submodule "ledfx/effects/colorchord"]
+	path = ledfx/effects/colorchord
+	url = https://github.com/cnlohr/colorchord.git

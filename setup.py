@@ -3,6 +3,8 @@
 from datetime import datetime as dt
 from setuptools import setup, find_packages
 import ledfx.consts as const
+from setuptools import Extension, setup
+from Cython.Build import cythonize
 
 PROJECT_PACKAGE_NAME = 'ledfx'
 PROJECT_VERSION = const.PROJECT_VERSION
@@ -50,5 +52,6 @@ setup(
         'ledfx_frontend':['*'],
         '': ['*.npy']
     },
-    
+    ext_modules = cythonize([Extension("note_finder", ["ledfx/effects/noteFinder.pyx","ledfx/effects/cnoteFinder.pxd","ledfx/effects/colorchord/**"])])
+
 )
