@@ -54,7 +54,7 @@ setup(
 	},
 	ext_modules=cythonize([
 		Extension(
-			"note_finder",
+			"ledfx.effects.noteFinder",
 			["ledfx/effects/noteFinder.pyx"],
 			include_dirs=[
 				"ledfx/effects/colorchord/colorchord2/cnfa",
