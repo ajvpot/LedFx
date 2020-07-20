@@ -27,5 +27,6 @@ cdef class NoteFinder:
 			raise MemoryError()
 		for i in range(len(samples)):
 			cfloats[i] = samples[i]/float(255)
+		#todo: check if samples is a numpy array. if it is use memory views instead of this copy stuff
 		cnoteFinder.RunNoteFinder(self._c_note_finder, cfloats, 0, len(samples))
 		free(cfloats)

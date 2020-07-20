@@ -55,7 +55,17 @@ setup(
 	ext_modules=cythonize([
 		Extension(
 			"ledfx.effects.noteFinder",
-			["ledfx/effects/noteFinder.pyx"],
+			[
+				"ledfx/effects/noteFinder.pyx",
+				"ledfx/effects/colorchord/colorchord2/notefinder.c",
+				"ledfx/effects/colorchord/colorchord2/parameters.c",
+				"ledfx/effects/colorchord/colorchord2/chash.c",
+				"ledfx/effects/colorchord/colorchord2/decompose.c",
+				"ledfx/effects/colorchord/colorchord2/dft.c",
+				"ledfx/effects/colorchord/colorchord2/util.c",
+				"ledfx/effects/colorchord/colorchord2/filter.c",
+				"ledfx/effects/colorchord/embeddedcommon/DFT32.c",
+			],
 			include_dirs=[
 				"ledfx/effects/colorchord/colorchord2/cnfa",
 				"ledfx/effects/colorchord/colorchord2/rawdraw",
@@ -68,7 +78,10 @@ setup(
 				"-flto",
 				"-Wall",
 				"-ffast-math",
-				"-g"
+				"-g",
+			],
+			libraries=[
+				"m",
 			],
 			depends=[
 				"ledfx/effects/cnoteFinder.pxd"
