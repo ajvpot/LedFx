@@ -69,7 +69,10 @@ setup(
 				"-Wall",
 				"-ffast-math",
 				"-g"
-			]
+			],
+			depends=[
+				"ledfx/effects/cnoteFinder.pxd"
+			],
 		)
 	])
 )

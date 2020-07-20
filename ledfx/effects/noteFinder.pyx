@@ -1,5 +1,5 @@
 cimport cython
-from ledfx.effects cimport cnoteFinder
+cimport cnoteFinder
 from libc.stdlib cimport malloc, free
 
 cdef class NoteFinder:
@@ -29,10 +29,3 @@ cdef class NoteFinder:
 			cfloats[i] = samples[i]/float(255)
 		cnoteFinder.RunNoteFinder(self._c_note_finder, cfloats, 0, len(samples))
 		free(cfloats)
-
-
-
-
-
-
-
