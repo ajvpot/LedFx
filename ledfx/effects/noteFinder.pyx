@@ -2,6 +2,14 @@ cimport cython
 cimport cnoteFinder
 from libc.stdlib cimport malloc, free
 
+cdef read_floats(float *ptr, int n):
+	cdef int i
+	lst=[]
+	for i in range(n):
+		lst.append(ptr[i])
+	return lst
+
+
 cdef class NoteFinder:
 	cdef cnoteFinder.NoteFinder* _c_note_finder
 
@@ -27,6 +35,13 @@ cdef class NoteFinder:
 			raise MemoryError()
 		for i in range(len(samples)):
 			cfloats[i] = samples[i]/float(255)
-		#todo: check if samples is a numpy array. if it is use memory views instead of this copy stuff
+		#todo: https://cython.readthedocs.io/en/latest/src/userguide/memoryviews.html use memory view
 		cnoteFinder.RunNoteFinder(self._c_note_finder, cfloats, 0, len(samples))
 		free(cfloats)
+
+	def get_amplitudes(self):
+		return dict(zip(read_floats(self._c_note_finder.note_positions, self._c_note_finder.note_peaks), read_floats(self._c_note_finder.note_amplitudes, self._c_note_finder.note_peaks)))
+
+	def get_current(self):
+		return self._c_note_finder.current_note_id
+

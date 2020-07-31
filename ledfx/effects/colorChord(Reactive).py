@@ -1,3 +1,6 @@
+import random
+
+from ledfx.color import COLORS
 from ledfx.effects.audio import AudioReactiveEffect, FREQUENCY_RANGES
 from ledfx.effects.gradient import GradientEffect
 from ledfx.effects.noteFinder import NoteFinder
@@ -7,29 +10,29 @@ import numpy as np
 class ColorChordAudioEffect(AudioReactiveEffect, GradientEffect):
     NAME = "ColorChord"
     CONFIG_SCHEMA = vol.Schema({
-        vol.Optional('frequency_range', description='Frequency range for the beat detection', default = 'bass'): vol.In(list(FREQUENCY_RANGES.keys())),
+        vol.Optional('sensitivity', description='Responsiveness to changes in sound', default = 0.7): vol.All(vol.Coerce(float), vol.Range(min=0.2, max=0.99)),
+        vol.Optional('color_lows', description='Color of low, bassy sounds', default = "red"): vol.In(list(COLORS.keys())),
     })
 
     _nf = None
 
     def config_updated(self, config):
         #todo: pass sample rate
-        self._nf = NoteFinder(44100)
-        self._frequency_range = np.linspace(
-            FREQUENCY_RANGES[self.config['frequency_range']].min,
-            FREQUENCY_RANGES[self.config['frequency_range']].max,
-            20)
+        self._nf = NoteFinder(48000)
+        decay_sensitivity = (self._config["sensitivity"]-0.2)*0.25
+        self._p_filter = self.create_filter(
+            alpha_decay = decay_sensitivity,
+            alpha_rise = self._config["sensitivity"])
+        self.lows_colour = np.array(COLORS[self._config['color_lows']], dtype=float)
 
     def audio_data_updated(self, data):
-        if True or self._nf is not None:
-            self._nf.samples_updated(data.audio_sample(True))
+            if self._nf is not None:
+                self._nf.samples_updated(data.audio_sample(True))
 
-        # Grab the filtered and interpolated melbank data
-        magnitude = np.max(data.sample_melbank(list(self._frequency_range)))
-        # if magnitude > 0.7:
-        #     self.pixels = self.apply_gradient(1.0)
-        # else:
-        #     self.pixels = self.apply_gradient(0.0)
-        if magnitude > 1.0:
-            magnitude = 1.0
-        self.pixels = self.apply_gradient(magnitude)
+            amps = self._nf.get_amplitudes()
+            segment_length = int(self.pixel_count/len(amps))
+            p = np.zeros(np.shape(self.pixels))
+            for freq, amp in amps.items():
+                p[int(freq%len(amps))*segment_length:(int(freq%len(amps))+1)*segment_length] += self.lows_colour*amp*20
+
+            self.pixels = self._p_filter.update(p)
